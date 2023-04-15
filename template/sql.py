@@ -90,3 +90,36 @@ class SQLDatabase():
             return True
         else:
             return False
+        
+
+        # Function to get a user ID from the database
+    def get_user_id(username):
+        # Connect to the database
+        conn = sqlite3.connect('users.db')
+        c = conn.cursor()
+
+        # Get the user ID
+        c.execute("SELECT id FROM users WHERE username = ?", (username,))
+        result = c.fetchone()
+
+        # Close the database connection
+        conn.close()
+
+        # If the user was found, return the ID
+        if result:
+            return result[0]
+        else:
+            return None
+
+    # Function to insert a message into the database
+    def insert_message(user_id, message):
+        # Connect to the database
+        conn = sqlite3.connect('messages.db')
+        c = conn.cursor()
+
+        # Insert the message into the database
+        c.execute("INSERT INTO messages (user_id, message) VALUES (?, ?)", (user_id, message))
+        conn.commit()
+
+        # Close the database connection
+        conn.close()

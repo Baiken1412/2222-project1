@@ -4,8 +4,10 @@
     maybe some simple program logic
 '''
 
+import json
 from bottle import route, get, post, error, request, static_file
-
+from cryptography.fernet import Fernet
+import base64
 import model
 
 #-----------------------------------------------------------------------------
@@ -115,6 +117,42 @@ def post_login():
     # Call the appropriate method
     return model.login_check(username, password)
 
+# Generate a 32-byte key that is url-safe
+key = Fernet.generate_key()
+key = base64.urlsafe_b64encode(key[:32])
+
+# Create a Fernet object with the key
+fernet = Fernet(key)
+
+# Function to handle sending messages
+@post('/send_message')
+def send_message():
+    # Get the message from the request
+    message = request.forms.get('message')
+
+    # Encrypt the message with Fernet
+    encrypted_message = fernet.encrypt(message.encode())
+
+    # Send the encrypted message to Andy
+    model.send_message('Andy', encrypted_message)
+
+    # Return a success message
+    return json.dumps({'status': 'success'})
+
+# Function to handle receiving messages
+@get('/get_messages')
+def get_messages():
+    # Get the messages from the model
+    messages = model.get_messages('Andy')
+
+    # Decrypt the messages with Fernet
+    decrypted_messages = []
+    for message in messages:
+        decrypted_message = fernet.decrypt(message.encode()).decode()
+        decrypted_messages.append(decrypted_message)
+
+    # Return the decrypted messages as JSON
+    return json.dumps({'messages': decrypted_messages})
 
 
 #-----------------------------------------------------------------------------

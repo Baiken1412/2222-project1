@@ -5,8 +5,10 @@
     It should exist as a separate layer to any database or data structure that you might be using
     Nothing here should be stateful, if it's stateful let the database handle it
 '''
+import sqlite3
 import view
 import random
+import sql
 
 # Initialise our views, all arguments are defaults for the template
 page_view = view.View()
@@ -81,6 +83,14 @@ def about():
         Returns the view for the about page
     '''
     return page_view("about", garble=about_garble())
+
+# Function to send a message to a user
+def send_message(username, message):
+    # Get the user ID
+    user_id = sql.get_user_id(username)
+
+    # Insert the message into the database
+    sqlite3.insert_message(user_id, message)
 
 
 

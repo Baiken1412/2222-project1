@@ -1,98 +1,63 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<html>
+  <head>
     <title>Chat with Andy</title>
     <style>
-        body {
-            background-color: #f2f2f2;
-            font-family: Arial, sans-serif;
-        }
-        .chatbox {
-            background-color: #fff;
-            border: 1px solid #ccc;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
-            margin: 50px auto;
-            width: 400px;
-        }
-        .chatbox-header {
-            background-color: #333;
-            color: #fff;
-            font-size: 1.2rem;
-            padding: 10px;
-            text-align: center;
-        }
-        .chatbox-body {
-            height: 300px;
-            overflow-y: scroll;
-            padding: 10px;
-        }
-        .chatbox-message {
-            background-color: #f2f2f2;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            padding: 10px;
-        }
-        .chatbox-message-sent {
-            background-color: #3f8fd2;
-            color: #fff;
-            float: right;
-        }
-        .chatbox-message-received {
-            background-color: #f2f2f2;
-            color: #333;
-            float: left;
-        }
-        .chatbox-input {
-            display: flex;
-            padding: 10px;
-        }
-        .chatbox-input input[type="text"] {
-            border: none;
-            border-radius: 5px;
-            flex: 1;
-            font-size: 1.2rem;
-            padding: 10px;
-        }
-        .chatbox-input button[type="submit"] {
-            background-color: #333;
-            border: none;
-            border-radius: 5px;
-            color: #fff;
-            font-size: 1.2rem;
-            margin-left: 10px;
-            padding: 10px;
-        }
+      /* Styles for the chat window */
+      #chatbox {
+        width: 80%;
+        height: 400px;
+        margin: 0 auto;
+        overflow: auto;
+        border: 1px solid black;
+        padding: 10px;
+      }
+
+      /* Styles for the chat messages */
+      .message {
+        border: 1px solid black;
+        padding: 5px;
+        margin-bottom: 5px;
+      }
+
+      /* Styles for the chat input */
+      #chatinput {
+        width: 80%;
+        margin: 0 auto;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
     </style>
-</head>
-<body>
-    <div class="chatbox">
-        <div class="chatbox-header">
-            <h1>Chat with Andy</h1>
-        </div>
-        <div class="chatbox-body">
-        </div>
-        <div class="chatbox-input">
-            <input type="text" id="message-input">
-            <button type="submit" onclick="sendMessage()">Send</button>
-        </div>
-    </div>
+  </head>
+  <body>
+    <h1>Chat with Andy</h1>
+    <div id="chatbox"></div>
+    <input type="text" id="chatinput" placeholder="Type a message...">
+    <button onclick="sendMessage()">Send</button>
     <script>
-        function sendMessage() {
-            var messageInput = document.getElementById("message-input");
-            var message = messageInput.value;
-            if (message.trim() == "") {
-                return;
-            }
-            var messageElement = document.createElement("div");
-            messageElement.classList.add("chatbox-message");
-            messageElement.classList.add("chatbox-message-sent");
-            messageElement.innerHTML = message;
-            var chatboxBody = document.querySelector(".chatbox-body");
-            chatboxBody.appendChild(messageElement);
-            messageInput.value = "";
-        }
+      var socket = new WebSocket("ws://" + window.location.host + "/chat");
+
+      socket.onmessage = function(event) {
+        var message = JSON.parse(event.data);
+        addMessage(message.sender, message.text);
+      };
+
+      function sendMessage() {
+        var input = document.getElementById("chatinput");
+        var message = input.value;
+        input.value = "";
+        var data = {"sender": "admin", "text": message};
+        socket.send(JSON.stringify(data));
+        addMessage("Me", message);
+      }
+
+      function addMessage(sender, text) {
+        var chatbox = document.getElementById("chatbox");
+        var message = document.createElement("div");
+        message.classList.add("message");
+        message.innerHTML = "<strong>" + sender + ":</strong> " + text;
+        chatbox.appendChild(message);
+      }
     </script>
-</body>
+  </body>
 </html>
