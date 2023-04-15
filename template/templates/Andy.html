@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chat Interface</title>
+    <style>
+        #container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+        #chat-box {
+            display: flex;
+            flex-direction: column;
+            border: 1px solid black;
+            width: 400px;
+            height: 500px;
+            margin-top: 50px;
+            padding: 20px;
+        }
+        #chat-messages {
+            flex: 1;
+            overflow-y: scroll;
+        }
+        #chat-input {
+            display: flex;
+            margin-top: 20px;
+            width: 100%;
+        }
+        #chat-input-text {
+            flex: 1;
+            padding: 10px;
+            font-size: 16px;
+        }
+        #chat-input-button {
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #chat-header {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="chat-box">
+            <div id="chat-header">Chat with Andy</div>
+            <div id="chat-messages"></div>
+            <div id="chat-input">
+                <input type="text" id="chat-input-text" placeholder="Type your message here...">
+                <button id="chat-input-button">Send</button>
+            </div>
+        </div>
+    </div>
