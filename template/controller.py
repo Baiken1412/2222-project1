@@ -127,6 +127,7 @@ key = base64.urlsafe_b64encode(key[:32])
 # Create a Fernet object with the key
 fernet = Fernet(key)
 
+
 # Function to handle sending messages
 @post('/send_message')
 def send_message():
@@ -158,6 +159,8 @@ def get_messages():
     return json.dumps({'messages': decrypted_messages})
 
 
+# Function to handle getting the conversation
+@get('/get_conversation')
 def get_conversation():
     '''
         get_conversation
@@ -175,6 +178,7 @@ def get_conversation():
 
     # Return the decrypted messages as JSON
     return json.dumps({'messages': decrypted_messages})
+
 
 
 #-----------------------------------------------------------------------------
