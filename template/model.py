@@ -9,6 +9,15 @@ import sqlite3
 import view
 import random
 import sql
+import base64
+from cryptography.fernet import Fernet
+
+# Generate a 32-byte key that is url-safe
+key = Fernet.generate_key()
+key = base64.urlsafe_b64encode(key[:32])
+
+# Create a Fernet object with the key
+fernet = Fernet(key)
 
 # Initialise our views, all arguments are defaults for the template
 page_view = view.View()
@@ -60,7 +69,7 @@ def login_check(username, password):
     # By default assume good creds
     login = True
     
-    if username != "admin": # Wrong Username
+    if username not in ["admin", "Andy"]: # Wrong Username
         err_str = "Incorrect Username"
         login = False
     
@@ -84,13 +93,35 @@ def about():
     '''
     return page_view("about", garble=about_garble())
 
-# Function to send a message to a user
-def send_message(username, message):
-    # Get the user ID
-    user_id = sql.get_user_id(username)
+def send_message(receiver, message):
+    # Get the user ID of the receiver
+    receiver_id = get_user_id(receiver)
 
     # Insert the message into the database
-    sqlite3.insert_message(user_id, message)
+    sql.insert_message(sql.get_user_id('Andy'), receiver_id, message)
+
+def get_user_id(username):
+    # Get the user ID
+    user_id = sql.get_user_id(username)
+    return user_id
+
+def get_conversation(user1, user2):
+    # Get the user IDs of the two users
+    user1_id = get_user_id(user1)
+    user2_id = get_user_id(user2)
+
+    # Get the conversation between the two users
+    conversation = sql.get_conversation(user1_id, user2_id)
+
+    # Decrypt the messages with Fernet
+    decrypted_messages = []
+    for message in conversation:
+        decrypted_message = fernet.decrypt(message.encode()).decode()
+        decrypted_messages.append(decrypted_message)
+
+    return decrypted_messages
+
+
 
 
 

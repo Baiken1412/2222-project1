@@ -9,7 +9,7 @@ from bottle import route, get, post, error, request, static_file
 from cryptography.fernet import Fernet
 import base64
 import model
-
+import sql
 #-----------------------------------------------------------------------------
 # Static file paths
 #-----------------------------------------------------------------------------
@@ -64,6 +64,7 @@ def serve_pictures(picture):
 # Pages
 #-----------------------------------------------------------------------------
 
+
 # Redirect to login
 @get('/')
 @get('/home')
@@ -85,6 +86,8 @@ def get_Andy_controller():
         Serves the friend list page for Andy
     '''
     return model.friend()
+
+
 
 
 
@@ -148,6 +151,25 @@ def get_messages():
     # Decrypt the messages with Fernet
     decrypted_messages = []
     for message in messages:
+        decrypted_message = fernet.decrypt(message.encode()).decode()
+        decrypted_messages.append(decrypted_message)
+
+    # Return the decrypted messages as JSON
+    return json.dumps({'messages': decrypted_messages})
+
+
+def get_conversation():
+    '''
+        get_conversation
+        Returns the conversation between Andy and the current user
+    '''
+
+    # Get the conversation between the two users
+    conversation = sql.get_conversation('Andy', 'current_user')
+
+    # Decrypt the messages with Fernet
+    decrypted_messages = []
+    for message in conversation:
         decrypted_message = fernet.decrypt(message.encode()).decode()
         decrypted_messages.append(decrypted_message)
 
